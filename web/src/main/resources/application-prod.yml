@@ -1,0 +1,10 @@
+server:
+  servlet:
+    context-path: /
+    session:
+      timeout: 10m
+      cookie:
+        # 必须配置，防止使用spring-session做session管理时导致相互间session不一致
+        name: BOOKING-SESSION-ID
+        same-site: none
+  port: 8080

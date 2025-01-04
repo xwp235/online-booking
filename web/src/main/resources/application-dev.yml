@@ -1,0 +1,31 @@
+server:
+  servlet:
+    context-path: /
+    session:
+      timeout: 10m
+      cookie:
+        # 必须配置，防止使用spring-session做session管理时导致相互间session不一致
+        name: BOOKING-SESSION-ID
+        same-site: lax
+  port: 8080
+spring:
+  task:
+    execution:
+      pool:
+        max-size: 4
+        queue-capacity: 8
+        keep-alive: 60s
+        core-size: 2
+      thread-name-prefix: async-task-
+      shutdown:
+        await-termination: on
+        await-termination-period: 60s
+    scheduling:
+      thread-name-prefix: schedule-task-
+      shutdown:
+        await-termination: on
+        await-termination-period: 60s
+      simple:
+        concurrency-limit: 4
+      pool:
+        size: 4

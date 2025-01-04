@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: online-booking
+  #  https://docs.spring.io/spring-boot/docs/3.2.0/reference/htmlsingle/#features.spring-application.virtual-threads
+  threads:
+    virtual:
+      enabled: on
+  main:
+    keep-alive: on
+  messages:
+    basename: multi-languages/info,multi-languages/error
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 60MB
+      enabled: on
+  mvc:
+    log-request-details: on
+    # spring-boot 2.2版本后要手动开启form的_method对delete和put的处理
+    hiddenmethod:
+      filter:
+        enabled: on
+config:
+  logging:
+    structured: ${LOGGING_STRUCTURED:on}
