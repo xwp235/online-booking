@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+    <property name="CONSOLE_LOG_THRESHOLD" value="INFO"/>
+
+    <springProfile name="dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>${CONSOLE_LOG_THRESHOLD}</level>
+            </filter>
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <charset>${CONSOLE_LOG_CHARSET}</charset>
+                <providers>
+                    <!-- 格式化时间戳 -->
+                    <timestamp>
+                        <fieldName>time</fieldName>
+                        <!--                    <timeZone>UTC</timeZone> &lt;!&ndash; 可选，指定时区 &ndash;&gt;-->
+                        <pattern>yyyy-MM-dd HH:mm:ss.SSSZ</pattern> <!-- 自定义时间格式 -->
+                    </timestamp>
+                    <logLevel>
+                        <fieldName>level</fieldName>
+                    </logLevel>
+                    <threadName>
+                        <fieldName>threadName</fieldName>
+                    </threadName>
+                    <!-- 其他字段 -->
+                    <message/>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
+                    <mdc/>
+                    <stackTrace>
+                        <fieldName>stackTrace</fieldName>
+                    </stackTrace>
+                </providers>
+            </encoder>
+            <!-- 添加自定义日志过滤器，过滤不需要输出日志的特定类 -->
+<!--            <logger name="com.xweb.starter.modules.security.mapper" level="TRACE" additivity="true" />-->
+            <!--        <filter class="com.xweb.starter.common.filter.LogbackFilter" />-->
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+</configuration>

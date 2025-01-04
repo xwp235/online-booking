@@ -13,6 +13,6 @@ public class AsyncService {
     @Async
     public void test1() {
         logger.info("test1 executed...");
-        int i = 1 / 0;
+//        int i = 1 / 0;
     }
 }

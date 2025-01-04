@@ -63,4 +63,3 @@ target
 *.njsproj
 *.sln
 *.sw?
-.env.*

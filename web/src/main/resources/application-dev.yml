@@ -1,12 +1,23 @@
 server:
+  tomcat:
+    # 这个参数是指在同一时间，tomcat能够接受的最大连接数。一般这个值要大于maxThreads+acceptCount。
+    max-connections: 8192
+    # 当调用Web服务的HTTP请求数达到tomcat的最大线程数时，还有新的HTTP请求到来，这时tomcat会将该请求放在等待队列中，这个acceptCount就是指能够接受的最大等待数，默认100.如果等待队列也被放满了，这个时候再来新的请求就会被tomcat拒绝（connection refused）
+    accept-count: 1000
+    threads:
+      # 每一次HTTP请求到达Web服务器，Web服务器都会创建一个线程来处理该请求，该参数决定了应用服务同时可以处理多少个HTTP请求，默认为200
+      max: 1000
+      # 最小空闲线程数
+      min-spare: 100
   servlet:
     context-path: /
     session:
       timeout: 10m
       cookie:
-        # 必须配置，防止使用spring-session做session管理时导致相互间session不一致
-        name: BOOKING-SESSION-ID
         same-site: lax
+        http-only: on
+        secure: off
+        path: ${server.servlet.context-path}
   port: 8080
 spring:
   task:
@@ -29,3 +40,21 @@ spring:
         concurrency-limit: 4
       pool:
         size: 4
+#  datasource:
+#    url: jdbc:postgresql://127.0.0.1:5432/order_web?stringtype=unspecified&timezone=UTC&jvmZone=UTC
+#    driver-class-name: org.postgresql.Driver
+#    type: com.zaxxer.hikari.HikariDataSource
+#    hikari:
+#      username: postgres
+#      password: password
+#      connection-timeout: 30000
+#      read-only: off
+#      minimum-idle: 2
+#      maximum-pool-size: 10
+#      auto-commit: on
+#      max-lifetime: 600000
+#      idle-timeout: 300000
+#      connection-test-query: select 1
+#      validation-timeout: 1500
+#      pool-name: ${spring.application.name}-HikariCP
+#      schema: public

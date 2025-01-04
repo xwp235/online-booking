@@ -39,6 +39,7 @@
         <owasp-java-encoder.version>1.3.1</owasp-java-encoder.version>
         <redisson-spring-boot-starter.version>3.40.0</redisson-spring-boot-starter.version>
         <poi.version>5.3.0</poi.version>
+        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
     </properties>
 
     <dependencyManagement>
@@ -153,6 +154,18 @@
               <groupId>com.tlcsdm</groupId>
               <artifactId>tlcsdm-asyncTool</artifactId>
               <version>${async-tool.version}</version>
+          </dependency>
+
+          <!-- https://github.com/logfellow/logstash-logback-encoder -->
+          <dependency>
+              <groupId>net.logstash.logback</groupId>
+              <artifactId>logstash-logback-encoder</artifactId>
+              <version>${logstash-logback-encoder.version}</version>
+              <!-- Use runtime scope if the project does not have any compile-time usage of logstash-logback-encoder,
+                   such as usage of StructuredArguments/Markers or implementations such as
+                   JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
+              <scope>runtime</scope>
+              -->
           </dependency>
 
 

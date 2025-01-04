@@ -1,3 +1,9 @@
+server:
+  servlet:
+    session:
+      cookie:
+        # 必须配置，防止使用spring-session做session管理时导致相互间session不一致
+        name: BOOKING-SESSION-ID
 spring:
   application:
     name: online-booking
@@ -20,6 +26,16 @@ spring:
     hiddenmethod:
       filter:
         enabled: on
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-enums-using-to-string: on
+      write-dates-as-timestamps: off
+      fail-on-empty-beans: off
+    default-property-inclusion: always
+    deserialization:
+      fail-on-unknown-properties: off
+    date-format: yyyy-MM-dd HH:mm:ss.SSSZ
 config:
   logging:
-    structured: ${LOGGING_STRUCTURED:on}
+    structured: ${LOGGING_STRUCTURED:off}

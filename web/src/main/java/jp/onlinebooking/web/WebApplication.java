@@ -3,64 +3,66 @@ package jp.onlinebooking.web;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.github.cdimascio.dotenv.DotenvException;
 import io.micrometer.common.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.StandardEnvironment;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.File;
+import java.util.*;
 
 @SpringBootApplication
 public class WebApplication {
 
+    private static final Logger log = LoggerFactory.getLogger(WebApplication.class);
+
     public static void main(String[] args) {
-        System.out.println(args.length);
-        System.getProperty("user.dir");
-        for (String arg : args) {
-            System.out.println("++");
-            System.out.println(arg);
-        }
-//        loadConfiguration();
-        /**
-         * // 创建 SpringApplication 实例
-         *         SpringApplication application = new SpringApplication(OnlineBookingApplication.class);
-         *
-         *         // 创建临时的 Spring 环境，用于读取配置文件
-         *         ConfigurableEnvironment environment = new StandardEnvironment();
-         *
-         *         // 读取配置属性 `config.logging.structured`
-         *         String structured = environment.getProperty("config.logging.structured", "off");
-         *
-         *         // 根据属性值决定加载的日志配置文件
-         *         String logConfig = "off".equalsIgnoreCase(structured)
-         *                 ? "classpath:logback-spring.xml"
-         *                 : "classpath:logback-spring-structured.xml";
-         *
-         *         // 动态设置 logging.config 属性
-         *         Map<String, Object> defaultProperties = new HashMap<>();
-         *         defaultProperties.put("logging.config", logConfig);
-         *         application.setDefaultProperties(defaultProperties);
-         */
-        SpringApplication.run(WebApplication.class, args);
+        loadConfiguration(args);
+        startApp(args);
     }
 
-    public static void loadConfiguration() {
+    public static void loadConfiguration(String[] args) {
         try {
-            // 加载相应的.env文件
-            var envName = System.getProperty("spring.profiles.active", "dev");
-            var filepath = System.getProperty("config");
-            if (StringUtils.isBlank(filepath)) {
-                filepath = System.getProperty("user.dir");
+            var useDefaultConfigFilepath = false;
+            if (args.length == 0) {
+                useDefaultConfigFilepath = true;
+                args = new String[] {
+                  System.getProperty("user.dir")
+                };
             }
+            var configFilePath = args[0];
+            if (useDefaultConfigFilepath) {
+                configFilePath = configFilePath + File.separator + "env";
+            }
+            var separatorIndex = configFilePath.lastIndexOf(File.separator);
+            var configFileDir = configFilePath.substring(0, separatorIndex);
+            var configFilename = configFilePath.substring(separatorIndex + 1);
             // 获取当前系统属性
             var currentEnv = System.getenv();
             var dotenv = Dotenv.configure()
-                    .directory(filepath)
-                    .filename(".env." + envName)
+                    .directory(configFileDir)
+                    .filename(configFilename)
                     .load();
             dotenv.entries().forEach(entry -> {
-                if (!currentEnv.containsKey(entry.getKey())) {
-//                    System.out.println(entry.getKey()+"--->"+entry.getValue());
-                    System.setProperty(entry.getKey(), entry.getValue());
+                var key = entry.getKey();
+                var val = entry.getValue();
+                if (!currentEnv.containsKey(key)) {
+                    if ("LOGGING_STRUCTURED".equals(key)) {
+                        var logFilename = "classpath:logback-spring.xml";
+                        if ("on".equals(val)) {
+                          logFilename = "classpath:logback-spring-structured.xml";
+                        }
+                        System.setProperty("logging.config", logFilename);
+                    }
+                    System.setProperty(key, val);
                 }
             });
         } catch (DotenvException e) {
@@ -78,6 +80,13 @@ public class WebApplication {
 //                throw e;
 //            }
         }
+    }
+
+    public static void startApp(String[] args) {
+        var app = new SpringApplicationBuilder(WebApplication.class);
+        app
+           .web(WebApplicationType.SERVLET)
+           .run(args);
     }
 
 }
