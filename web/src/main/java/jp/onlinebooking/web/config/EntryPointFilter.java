@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
@@ -24,12 +23,12 @@ public class EntryPointFilter extends OncePerRequestFilter {
         // 生成一个唯一的 LOG_ID
         String logId = request.getHeader(Constants.X_REQUESTED_ID);
         if (StringUtils.isBlank(logId)) {
-            logId = UUID
+            logId = UUID.randomUUID().toString();
         }
 
         try {
             // 将 LOG_ID 放入 MDC
-            MDC.put("logId", logId);
+            MDC.put(Constants.MDC.LOG_ID, logId);
             var isGet = StringUtils.equalsIgnoreCase(request.getMethod(), HttpMethod.GET.name());
             if (!isGet && isAjaxRequest(request)) {
                 filterChain.doFilter(new ReusableHttpServletRequestWrapper(request), response);
@@ -37,7 +36,7 @@ public class EntryPointFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
         } finally {
-            MDC.remove("logId");
+            MDC.remove(Constants.MDC.LOG_ID);
         }
     }
 

@@ -3,6 +3,7 @@ package jp.onlinebooking.web.config;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import jp.onlinebooking.web.config.properties.SystemProperties;
+import org.springframework.boot.autoconfigure.jdbc.JdbcClientAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -13,30 +14,14 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 @Configuration
 @EnableConfigurationProperties(SystemProperties.class)
 public class SystemConfig implements WebMvcConfigurer {
-
-    @Bean
-    com.fasterxml.jackson.databind.Module simpleModule() {
-        var simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-        simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
-        return simpleModule;
-    }
-
-    @Bean
-    FilterRegistrationBean<EntryPointFilter> entryPointFilter() {
-        var registrationBean = new FilterRegistrationBean<EntryPointFilter>();
-        registrationBean.setFilter(new EntryPointFilter());
-        registrationBean.setUrlPatterns(List.of("/*"));
-        registrationBean.setEnabled(true);
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return registrationBean;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -56,6 +41,24 @@ public class SystemConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    com.fasterxml.jackson.databind.Module simpleModule() {
+        var simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
+        simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+        return simpleModule;
+    }
+
+    @Bean
+    FilterRegistrationBean<EntryPointFilter> entryPointFilter() {
+        var registrationBean = new FilterRegistrationBean<EntryPointFilter>();
+        registrationBean.setFilter(new EntryPointFilter());
+        registrationBean.setUrlPatterns(List.of("/*"));
+        registrationBean.setEnabled(true);
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registrationBean;
+    }
+
+    @Bean
     CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
         // 允许特定的域名（可以使用 "*" 允许所有域名）
@@ -66,13 +69,18 @@ public class SystemConfig implements WebMvcConfigurer {
         configuration.setAllowedHeaders(List.of(CorsConfiguration.ALL));
         // 是否允许发送 Cookie
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of(Constants.X_AUTHENTICATE,Constants.X_REQUESTED_ID));
         // 一小时内不再需要预检（发送OPTIONS请求）
         configuration.setMaxAge(3600L);
-        configuration.addExposedHeader("X-Authenticate");
         // 配置路径匹配策略
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**",configuration);
         return source;
+    }
+
+    @Bean
+    JdbcClient jdbcClient(DataSource dataSource) {
+        return JdbcClient.create(dataSource);
     }
 
 }

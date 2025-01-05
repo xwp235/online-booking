@@ -1,18 +1,15 @@
 package jp.onlinebooking.web.config;
 
 import io.micrometer.common.lang.NonNullApi;
-import org.slf4j.MDC;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -48,27 +45,6 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setTaskDecorator(new AsyncTaskDecorator());
         executor.initialize();
         return executor;
-    }
-
-    public static class AsyncTaskDecorator implements TaskDecorator {
-        @Override
-        public Runnable decorate(Runnable runnable) {
-            // メインスレッドからコンテキストデータを取得
-            var contextMap = MDC.getCopyOfContextMap();
-            return () -> {
-                try {
-                    if (Objects.nonNull(contextMap)) {
-                        // サブスレッドが実行される前に、現在のサブスレッドのコンテキストにデータを設定
-                        MDC.setContextMap(contextMap);
-                    } else {
-                        MDC.clear();
-                    }
-                    runnable.run();
-                } finally {
-                    MDC.clear();
-                }
-            };
-        }
     }
 
 }

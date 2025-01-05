@@ -40,21 +40,21 @@ spring:
         concurrency-limit: 4
       pool:
         size: 4
-#  datasource:
-#    url: jdbc:postgresql://127.0.0.1:5432/order_web?stringtype=unspecified&timezone=UTC&jvmZone=UTC
-#    driver-class-name: org.postgresql.Driver
-#    type: com.zaxxer.hikari.HikariDataSource
-#    hikari:
-#      username: postgres
-#      password: password
-#      connection-timeout: 30000
-#      read-only: off
-#      minimum-idle: 2
-#      maximum-pool-size: 10
-#      auto-commit: on
-#      max-lifetime: 600000
-#      idle-timeout: 300000
-#      connection-test-query: select 1
-#      validation-timeout: 1500
-#      pool-name: ${spring.application.name}-HikariCP
-#      schema: public
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/order_web?stringtype=unspecified&timezone=UTC&jvmZone=UTC
+    driver-class-name: org.postgresql.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      username: postgres
+      password: password
+      connection-timeout: 30000
+      read-only: off
+      minimum-idle: 20
+      maximum-pool-size: 50
+      auto-commit: on
+      max-lifetime: 600000
+      idle-timeout: 300000
+      connection-test-query: select 1
+      validation-timeout: 1500
+      pool-name: ${spring.application.name}-HikariCP
+      schema: public
