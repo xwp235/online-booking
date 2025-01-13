@@ -1,12 +1,9 @@
 package jp.onlinebooking.web.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.util.StreamUtils;
 
 import java.io.ByteArrayInputStream;
@@ -23,28 +20,7 @@ public final class ReusableHttpServletRequestWrapper extends HttpServletRequestW
         var outputRequestStream = new ByteArrayOutputStream();
         StreamUtils.copy(request.getInputStream(),outputRequestStream);
         var originalBody = outputRequestStream.toString(StandardCharsets.UTF_8);
-        // todo 对可能为xss攻击的内容进行转义处理
-        var sanitizedBody = originalBody;
-        System.out.println(sanitizedBody);
-        requestInputStream = new ByteArrayInputStream(sanitizedBody.getBytes(StandardCharsets.UTF_8));
-    }
-
-    // 用于安全处理请求体内容
-    private String sanitizeBody(String originalBody) {
-        String sanitizedBody = StringEscapeUtils.escapeHtml4(originalBody);
-        sanitizedBody = sanitizedBody.replaceAll("(?i)<script", "&lt;script")
-                .replaceAll("(?i)</script", "&lt;/script");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            JsonNode jsonNode = objectMapper.readTree(originalBody);
-            // 对 JSON 数据进行处理（比如移除不必要的字段）
-            return objectMapper.writeValueAsString(jsonNode);
-        } catch (IOException e) {
-            e.printStackTrace();
-            // 处理 JSON 解析异常
-            return sanitizedBody;
-        }
+        requestInputStream = new ByteArrayInputStream(originalBody.getBytes(StandardCharsets.UTF_8));
     }
 
 

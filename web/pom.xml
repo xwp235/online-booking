@@ -67,6 +67,16 @@
             <artifactId>postgresql</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

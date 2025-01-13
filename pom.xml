@@ -40,6 +40,8 @@
         <redisson-spring-boot-starter.version>3.40.0</redisson-spring-boot-starter.version>
         <poi.version>5.3.0</poi.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+        <esapi.version>2.6.0.0</esapi.version>
+        <jte.version>3.1.15</jte.version>
     </properties>
 
     <dependencyManagement>
@@ -109,6 +111,12 @@
               <artifactId>encoder</artifactId>
               <version>${owasp-java-encoder.version}</version>
           </dependency>
+          <!-- https://owasp.org/www-project-enterprise-security-api -->
+          <dependency>
+              <groupId>org.owasp.esapi</groupId>
+              <artifactId>esapi</artifactId>
+              <version>${esapi.version}</version>
+          </dependency>
           <!-- https://github.com/ua-parser/uap-java -->
           <dependency>
               <groupId>com.github.ua-parser</groupId>
@@ -168,6 +176,12 @@
               -->
           </dependency>
 
+          <!-- https://github.com/casid/jte?tab=readme-ov-file -->
+          <dependency>
+              <groupId>gg.jte</groupId>
+              <artifactId>jte</artifactId>
+              <version>${jte.version}</version>
+          </dependency>
 
       </dependencies>
     </dependencyManagement>
